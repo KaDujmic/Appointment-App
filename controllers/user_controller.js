@@ -38,6 +38,7 @@ exports.create_user = async (req, res, next) => {
 	next();
 };
 
+// Update user with no restrictions at the moment
 exports.update_user = async (req, res, next) => {
 	try {
 		const user = await User.findByIdAndUpdate(req.params.id, req.body, {
@@ -60,6 +61,7 @@ exports.update_user = async (req, res, next) => {
 	next();
 };
 
+// Delete User with no restrictions at the moment
 exports.delete_user = async (req, res, next) => {
 	try {
 		const user = await User.findByIdAndDelete(req.params.id);
