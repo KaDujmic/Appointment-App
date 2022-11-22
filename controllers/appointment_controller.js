@@ -11,9 +11,10 @@ exports.get_all_appointments = async (req, res, next) => {
 				appointments,
 			},
 		});
-	} catch {
+	} catch (err) {
 		res.status(404).json({
-			msg: 'Not Found',
+			status: 'fail',
+			msg: err.message,
 		});
 	}
 	next();
@@ -29,9 +30,10 @@ exports.create_appointment = async (req, res, next) => {
 				appointment,
 			},
 		});
-	} catch {
+	} catch (err) {
 		res.status(400).json({
-			msg: 'Unable to create an Appointment. Please try again later.',
+			status: 'fail',
+			msg: err.message,
 		});
 	}
 	next();
@@ -56,8 +58,8 @@ exports.update_appointment = async (req, res, next) => {
 			},
 		});
 	} catch {
-		console.log(res);
 		res.status(400).json({
+			status: 'fail',
 			msg: 'Unable to update the appointment',
 		});
 	}
@@ -75,7 +77,8 @@ exports.delete_appointment = async (req, res, next) => {
 		});
 	} catch {
 		console.log(res);
-		res.status(401).json({
+		res.status(400).json({
+			status: 'fail',
 			msg: 'Unable to delete the appointment',
 		});
 	}

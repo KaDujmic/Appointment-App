@@ -34,7 +34,6 @@ const appointment_schema = new mongoose.Schema({
 appointment_schema.pre('save', function (next) {
 	const day = this.visit_date.getDay();
 	if (day === 1 || day === 2) {
-		console.log('Day appointment error');
 		throw new Error('You cannot schedule an appointment on Monday or Tuesday');
 	}
 	next();
@@ -50,7 +49,6 @@ appointment_schema.pre('save', async function (next) {
 		obj.visit_date.toISOString()
 	);
 	if (doctor_appointments.includes(this.visit_date.toISOString())) {
-		console.log('Duplicate appointment error');
 		throw new Error('You cannot schedule an appointment doctor is booked then');
 	}
 	next();
@@ -73,7 +71,6 @@ appointment_schema.pre('save', function (next) {
 	const date = this.visit_date.getTime();
 	const todays_date = new Date().getTime();
 	if (date < todays_date) {
-		console.log('Prior date appointment error');
 		throw new Error('You cannot schedule an appointment prior to todays date');
 	}
 	next();

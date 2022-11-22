@@ -1,7 +1,7 @@
 const express = require('express');
 const appointment_controller = require('./../controllers/appointment_controller');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router
 	.route('/')
