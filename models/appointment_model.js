@@ -45,7 +45,7 @@ appointment_schema.pre('save', async function (next) {
 	let doctor_appointments = await Appointment.find({
 		doctor: this.doctor,
 	});
-	// toISOString function is used, req.body is an object also doctor_appointments, when converted can be compared
+	// toISOString function is used, req.body and doctor_appointments are an object, when converted can be compared
 	doctor_appointments = doctor_appointments.map((obj) =>
 		obj.visit_date.toISOString()
 	);
@@ -64,6 +64,17 @@ appointment_schema.pre('save', function (next) {
 		throw new Error(
 			'You can only schedule an appointment on a full hour e.g. 16:00'
 		);
+	}
+	next();
+});
+
+// This middleware function prevents booking of an appointment that is prior than todays date
+appointment_schema.pre('save', function (next) {
+	const date = this.visit_date.getTime();
+	const todays_date = new Date().getTime();
+	if (date < todays_date) {
+		console.log('Prior date appointment error');
+		throw new Error('You cannot schedule an appointment prior to todays date');
 	}
 	next();
 });
