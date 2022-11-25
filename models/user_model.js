@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcrypt');
 
 const user_schema = new mongoose.Schema({
 	name: {
@@ -34,6 +35,21 @@ const user_schema = new mongoose.Schema({
 			message: 'Passwords do not match! Please try again!',
 		},
 	},
+	password_changed_at: {
+		type: Date,
+	},
+	password_reset_token: String,
+	password_reset_expires: Date,
+});
+
+user_schema.pre('save', async function (next) {
+	console.log('Hello from middleware');
+	if (this.isModified('password')) {
+		this.password = await bcrypt.hash(this.password, 12);
+		this.password_confirm = undefined;
+	}
+
+	return next();
 });
 
 const User = mongoose.model('User', user_schema);

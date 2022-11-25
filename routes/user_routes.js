@@ -1,6 +1,7 @@
 const express = require('express');
 const user_controller = require('./../controllers/user_controller');
 const appointment_controller = require('../controllers/appointment_controller');
+const authentication_controller = require('../controllers/authentication_controller');
 
 const router = express.Router({ mergeParams: true });
 
@@ -16,5 +17,8 @@ router
 	.delete(user_controller.delete_user);
 
 router.route('/:id/appointments').get(user_controller.get_doctor_appointments);
+
+router.post('/signup', authentication_controller.signup);
+router.post('/login', authentication_controller.login);
 
 module.exports = router;

@@ -119,15 +119,11 @@ exports.get_doctor_appointments = async (req, res, next) => {
 		let year = new Date().getFullYear();
 		const array_appointments = [];
 
-		console.log(appointments);
-
 		// For loop where we go through all days in a month !!! THERE IS AND ISSUE ON 11/29 FOR SOME REASON AND INCLUDES 12/01
 		for (let m = month; m <= month; m++) {
-			if (m === month + 1) break;
-			let max_days = new Date(year, month, 0).getDate();
+			let max_days = new Date(year, m, 0).getDate();
 			for (let d = day; d <= max_days; d++) {
 				for (let h = hour; h <= 24; h++) {
-					// console.log({ d, h }); // BUT THE OUTPUT HERE SHOWS 11/29 OKAY AND NO 12/01
 					const date = new Date(year, m, d, h).toISOString();
 					const mon_or_tue = new Date(year, m, d, h).getDay();
 
@@ -137,14 +133,16 @@ exports.get_doctor_appointments = async (req, res, next) => {
 						mon_or_tue !== 1 &&
 						mon_or_tue !== 2
 					) {
-						console.log({ d, h });
+						console.log({ m, h, d });
 						array_appointments.push(date);
 					}
-					if (h === 24) hour = 1;
+					if (h === 24) break;
 				}
 				if (d === max_days) day = 1;
 			}
 		}
+
+		console.log(array_appointments);
 
 		res.status(200).json({
 			status: 'success',
