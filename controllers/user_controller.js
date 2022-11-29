@@ -12,13 +12,10 @@ exports.get_all_users = async (req, res, next) => {
 				users,
 			},
 		});
-	} catch (err) {
-		res.status(400).json({
-			status: 'fail',
-			msg: err.message,
-		});
+		next()
+	} catch {
+		next()
 	}
-	next();
 };
 
 // Get a certain user, needs more filtration options.

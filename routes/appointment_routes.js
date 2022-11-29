@@ -1,7 +1,10 @@
 const express = require('express');
 const appointment_controller = require('./../controllers/appointment_controller');
+const authentication_controller = require('./../controllers/authentication_controller')
 
 const router = express.Router({ mergeParams: true });
+
+router.use(authentication_controller.protect)
 
 router
 	.route('/')

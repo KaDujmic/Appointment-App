@@ -5,6 +5,11 @@ const authentication_controller = require('../controllers/authentication_control
 
 const router = express.Router({ mergeParams: true });
 
+router.post('/signup', authentication_controller.signup);
+router.post('/login', authentication_controller.login);
+
+router.use(authentication_controller.protect)
+
 router
 	.route('/')
 	.get(user_controller.get_all_users)
@@ -18,7 +23,5 @@ router
 
 router.route('/:id/appointments').get(user_controller.get_doctor_appointments);
 
-router.post('/signup', authentication_controller.signup);
-router.post('/login', authentication_controller.login);
 
 module.exports = router;

@@ -76,6 +76,17 @@ appointment_schema.pre('save', function (next) {
 	next();
 });
 
+// This middleware function will send an email notification to doctor and the patient with the information about their schedule
+appointment_schema.post('save', async function () {
+	const doctor = await User.find(this.doctor);
+	const patient = await User.find(this.patient);
+	console.log(this, {
+		patient,
+		doctor
+	});
+	next()
+})
+
 const Appointment = mongoose.model('Appointment', appointment_schema);
 
 module.exports = Appointment;

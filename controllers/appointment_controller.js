@@ -42,25 +42,28 @@ exports.create_appointment = async (req, res, next) => {
 // Update appointment with no restrictions at the moment
 exports.update_appointment = async (req, res, next) => {
 	try {
-		const appointment = await Appointment.findByIdAndUpdate(
-			req.params.id,
-			req.body,
-			{
-				new: true,
-				runValidators: true,
-			}
-		);
-
-		res.status(200).json({
-			status: 'success',
-			data: {
-				appointment,
-			},
-		});
-	} catch {
+		if (req.user.role === 'admin' || req.user.role === 'doctor') {
+			const new_body = { status: req.body.status }
+			const appointment = await Appointment.findByIdAndUpdate(
+				req.params.id,
+				new_body,
+				{
+					new: true,
+					runValidators: true,
+				}
+			);
+	
+			res.status(200).json({
+				status: 'success',
+				data: {
+					appointment,
+				},
+			});
+		} else throw new Error('You do not have permission to update an appointment!')
+	} catch (err) {
 		res.status(400).json({
 			status: 'fail',
-			msg: 'Unable to update the appointment',
+			msg: err.message,
 		});
 	}
 	next();
@@ -75,11 +78,11 @@ exports.delete_appointment = async (req, res, next) => {
 			status: 'success',
 			data: null,
 		});
-	} catch {
+	} catch (err) {
 		console.log(res);
 		res.status(400).json({
 			status: 'fail',
-			msg: 'Unable to delete the appointment',
+			msg: err.message,
 		});
 	}
 	next();
