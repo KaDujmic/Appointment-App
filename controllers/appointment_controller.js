@@ -42,8 +42,10 @@ exports.create_appointment = async (req, res, next) => {
 // Update appointment with no restrictions at the moment
 exports.update_appointment = async (req, res, next) => {
 	try {
+		// Only doctor or admin can update the appointment
 		if (req.user.role === 'admin' || req.user.role === 'doctor') {
-			const new_body = { status: req.body.status }
+			// Then we pull the status from req.body and store it in a variable so no other value can be updated
+			const new_body = { status: req.body.status };
 			const appointment = await Appointment.findByIdAndUpdate(
 				req.params.id,
 				new_body,
@@ -52,14 +54,15 @@ exports.update_appointment = async (req, res, next) => {
 					runValidators: true,
 				}
 			);
-	
+
 			res.status(200).json({
 				status: 'success',
 				data: {
 					appointment,
 				},
 			});
-		} else throw new Error('You do not have permission to update an appointment!')
+		} else
+			throw new Error('You do not have permission to update an appointment!');
 	} catch (err) {
 		res.status(400).json({
 			status: 'fail',

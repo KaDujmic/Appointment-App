@@ -89,20 +89,19 @@ exports.protect = async (req, res, next) => {
 		// 	token = req.cookies.jwt;
 		// 	console.log(`${token} Cookies`)
 		// }
-		if (!token) throw new Error('You are not logged in. Please log in!')
-	
+		if (!token) throw new Error('You are not logged in. Please log in!');
+
 		// 2) Verification of the token
 		const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-	
+
 		// 3) Check if the user still exists
 		const current_user = await User.findById(decoded.id);
 		if (!current_user) throw new Error('The user no longer exists!');
-	
+
 		// 4) Set local storage and req.user to current_user
 		req.user = current_user;
 		res.locals.user = current_user;
 		next();
-
 	} catch (err) {
 		res.status(401).json({
 			stats: 'fail',
@@ -111,33 +110,27 @@ exports.protect = async (req, res, next) => {
 	}
 };
 
-
 exports.is_logged_in = async (req, res, next) => {
-  if (req.cookies.jwt) {
-    try {
-      // 1) Verifies the token
-      const decoded = await promisify(jwt.verify)(
-        req.cookies.jwt,
-        process.env.JWT_SECRET
-      );
+	if (req.cookies.jwt) {
+		try {
+			// 1) Verifies the token
+			const decoded = await promisify(jwt.verify)(
+				req.cookies.jwt,
+				process.env.JWT_SECRET
+			);
 
-      // 2) Check if the user still exists
-      const current_user = await User.findById(decoded.id);
-      if (!current_user) {
-        return next();
-      }
+			// 2) Check if the user still exists
+			const current_user = await User.findById(decoded.id);
+			if (!current_user) {
+				return next();
+			}
 
-      // 3) CHeck if the user changed passowrd afther the token was issued
-      if (current_user.changed_password_after(decoded.iat)) {
-        return next();
-      }
-
-      // There is a logged in user
-      res.locals.user = current_user;
-      return next();
-    } catch (err) {
-      return next();
-    }
-  }
-  next();
+			// There is a logged in user
+			res.locals.user = current_user;
+			return next();
+		} catch (err) {
+			return next();
+		}
+	}
+	next();
 };
