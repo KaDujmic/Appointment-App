@@ -8,7 +8,7 @@ const router = express.Router({ mergeParams: true });
 router.post('/signup', authentication_controller.signup);
 router.post('/login', authentication_controller.login);
 
-router.use(authentication_controller.protect)
+router.use(authentication_controller.protect);
 
 router
 	.route('/')
@@ -21,7 +21,6 @@ router
 	.put(user_controller.update_user)
 	.delete(user_controller.delete_user);
 
-router.route('/:id/appointments').get(user_controller.get_doctor_appointments);
-
+router.route('/:id/appointments').get(user_controller.get_user_appointments);
 
 module.exports = router;

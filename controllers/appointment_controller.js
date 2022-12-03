@@ -75,14 +75,16 @@ exports.update_appointment = async (req, res, next) => {
 // Delete appointment with no restrictions at the moment
 exports.delete_appointment = async (req, res, next) => {
 	try {
-		const appointment = await Appointment.findByIdAndDelete(req.params.id);
+		if (req.user.role === 'admin') {
+			const appointment = await Appointment.findByIdAndDelete(req.params.id);
 
-		res.status(201).json({
-			status: 'success',
-			data: null,
-		});
+			res.status(201).json({
+				status: 'success',
+				data: null,
+			});
+		} else
+			throw new Error('You do not have permission to delete an appointment!');
 	} catch (err) {
-		console.log(res);
 		res.status(400).json({
 			status: 'fail',
 			msg: err.message,

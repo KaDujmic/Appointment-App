@@ -22,7 +22,7 @@ const create_send_token = (user, status_code, res) => {
 		httpOnly: true,
 	};
 
-	// res.cookie('jwt', token, cookie_options);
+	res.cookie('jwt', token, cookie_options);
 
 	res.status(status_code).json({
 		status: 'success',
@@ -76,19 +76,17 @@ exports.login = async (req, res, next) => {
 
 exports.protect = async (req, res, next) => {
 	try {
-		// 1) Getting the token and check if it's there
+		// 1) Getting the token and check if it's there Bearer or Cookie
 		let token;
 		if (
 			req.headers.authorization &&
 			req.headers.authorization.startsWith('Bearer')
 		) {
 			token = req.headers.authorization.split(' ')[1];
+		} else if (req.cookies.jwt) {
+			token = req.cookies.jwt;
+			console.log(`${token} Cookies`);
 		}
-		// Else if statment where we set cookie but commented out to test Bearer Token from postman
-		// } else if (req.cookies.jwt) {
-		// 	token = req.cookies.jwt;
-		// 	console.log(`${token} Cookies`)
-		// }
 		if (!token) throw new Error('You are not logged in. Please log in!');
 
 		// 2) Verification of the token
@@ -110,27 +108,29 @@ exports.protect = async (req, res, next) => {
 	}
 };
 
-exports.is_logged_in = async (req, res, next) => {
-	if (req.cookies.jwt) {
-		try {
-			// 1) Verifies the token
-			const decoded = await promisify(jwt.verify)(
-				req.cookies.jwt,
-				process.env.JWT_SECRET
-			);
+// NOT IN USE YET
 
-			// 2) Check if the user still exists
-			const current_user = await User.findById(decoded.id);
-			if (!current_user) {
-				return next();
-			}
+// exports.is_logged_in = async (req, res, next) => {
+// 	if (req.cookies.jwt) {
+// 		try {
+// 			// 1) Verifies the token
+// 			const decoded = await promisify(jwt.verify)(
+// 				req.cookies.jwt,
+// 				process.env.JWT_SECRET
+// 			);
 
-			// There is a logged in user
-			res.locals.user = current_user;
-			return next();
-		} catch (err) {
-			return next();
-		}
-	}
-	next();
-};
+// 			// 2) Check if the user still exists
+// 			const current_user = await User.findById(decoded.id);
+// 			if (!current_user) {
+// 				return next();
+// 			}
+
+// 			// There is a logged in user
+// 			res.locals.user = current_user;
+// 			return next();
+// 		} catch (err) {
+// 			return next();
+// 		}
+// 	}
+// 	next();
+// };

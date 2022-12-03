@@ -12,9 +12,9 @@ exports.get_all_users = async (req, res, next) => {
 				users,
 			},
 		});
-		next()
+		next();
 	} catch {
-		next()
+		next();
 	}
 };
 
@@ -40,13 +40,16 @@ exports.get_user = async (req, res, next) => {
 // Default way to create a user, no restrictions yet. Simple error handling.
 exports.create_user = async (req, res, next) => {
 	try {
-		const user = await User.create(req.body);
-		res.status(201).json({
-			status: 'success',
-			data: {
-				user,
-			},
-		});
+		// Restrict croation of a USER to Admin or Doctor, in case of INVITE ONLY applicaiton
+		if (req.user.role === 'admin' || req.user.role === 'doctor') {
+			const user = await User.create(req.body);
+			res.status(201).json({
+				status: 'success',
+				data: {
+					user,
+				},
+			});
+		} else throw new Error('You do not have permission to create a user!');
 	} catch (err) {
 		res.status(400).json({
 			status: 'fail',
@@ -59,17 +62,19 @@ exports.create_user = async (req, res, next) => {
 // Update user with no restrictions at the moment
 exports.update_user = async (req, res, next) => {
 	try {
-		const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-			new: true,
-			runValidators: true,
-		});
+		if (req.user.role === 'admin') {
+			const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+				new: true,
+				runValidators: true,
+			});
 
-		res.status(200).json({
-			status: 'success',
-			data: {
-				user,
-			},
-		});
+			res.status(200).json({
+				status: 'success',
+				data: {
+					user,
+				},
+			});
+		} else throw new Error('You do not have permission to update a user!');
 	} catch (err) {
 		res.status(400).json({
 			status: 'fail',
@@ -82,17 +87,19 @@ exports.update_user = async (req, res, next) => {
 // Delete User with no restrictions at the moment
 exports.delete_user = async (req, res, next) => {
 	try {
-		const user = await User.findByIdAndDelete(req.params.id);
-		let appointments = await Appointment.find({
-			patient: req.params.id,
-		});
-		appointments = appointments.map((obj) => obj.visit_date.toISOString());
-		console.log(appointments);
+		if (req.user.role === 'admin') {
+			const user = await User.findByIdAndDelete(req.params.id);
+			let appointments = await Appointment.find({
+				patient: req.params.id,
+			});
+			appointments = appointments.map((obj) => obj.visit_date.toISOString());
+			console.log(appointments);
 
-		res.status(201).json({
-			status: 'success',
-			data: null,
-		});
+			res.status(201).json({
+				status: 'success',
+				data: null,
+			});
+		} else throw new Error('You do not have permission to delete a user!');
 	} catch (err) {
 		res.status(400).json({
 			stats: 'fail',
@@ -102,7 +109,7 @@ exports.delete_user = async (req, res, next) => {
 	next();
 };
 
-// Get appointments available for a certain doctor
+// Get appointments available for a certain doctor NOT FINISHED <================================================================
 exports.get_doctor_appointments = async (req, res, next) => {
 	try {
 		let appointments = await Appointment.find({
@@ -153,4 +160,27 @@ exports.get_doctor_appointments = async (req, res, next) => {
 		});
 	}
 	next();
+};
+
+// Get all appointmets for a certain user
+exports.get_user_appointments = async (req, res, next) => {
+	try {
+		const user_role = await User.findById(req.params.id);
+		const appointments = await Appointment.find({
+			[user_role.role]: req.params.id,
+		});
+
+		res.status(200).json({
+			status: 'success',
+			results: appointments.length,
+			data: appointments,
+		});
+		next();
+	} catch (err) {
+		res.status(400).json({
+			stats: 'fail',
+			msg: err.message,
+		});
+		next();
+	}
 };
