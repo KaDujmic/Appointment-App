@@ -12,7 +12,10 @@ const user_schema = new mongoose.Schema({
 		required: [true, 'Please enter your email address!'],
 		unique: true,
 		lowercase: true,
-		validate: [validator.isEmail, 'Please provide a valid email address!'],
+		validate: [
+			validator.isEmail,
+			'Please provide a valid email address!',
+		],
 	},
 	role: {
 		type: String,

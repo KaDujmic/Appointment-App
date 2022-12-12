@@ -9,15 +9,26 @@ const sign_token = (id) => {
 		expiresIn: process.env.JWT_EXPIRES_IN,
 	});
 };
-const correct_password = async function (candidate_password, user_password) {
-	return await bcrypt.compare(candidate_password, user_password);
+const correct_password = async function (
+	candidate_password,
+	user_password
+) {
+	return await bcrypt.compare(
+		candidate_password,
+		user_password
+	);
 };
 
 const create_send_token = (user, status_code, res) => {
 	const token = sign_token(user._id);
 	const cookie_options = {
 		expires: new Date(
-			Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+			Date.now() +
+				process.env.JWT_COOKIE_EXPIRES_IN *
+					24 *
+					60 *
+					60 *
+					1000
 		),
 		httpOnly: true,
 	};
@@ -59,10 +70,15 @@ exports.login = async (req, res, next) => {
 		if (!email || !password) {
 			throw new Error('Enter your email or password');
 		}
-		const user = await User.findOne({ email }).select('+password');
+		const user = await User.findOne({ email }).select(
+			'+password'
+		);
 
 		// If no user or the password is incorrect throw error
-		if (!user || !correct_password(password, user.password)) {
+		if (
+			!user ||
+			!correct_password(password, user.password)
+		) {
 			throw new Error('Incorrect email or password!');
 		}
 		create_send_token(user, 200, res);
@@ -87,14 +103,21 @@ exports.protect = async (req, res, next) => {
 			token = req.cookies.jwt;
 			console.log(`${token} Cookies`);
 		}
-		if (!token) throw new Error('You are not logged in. Please log in!');
+		if (!token)
+			throw new Error(
+				'You are not logged in. Please log in!'
+			);
 
 		// 2) Verification of the token
-		const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+		const decoded = await promisify(jwt.verify)(
+			token,
+			process.env.JWT_SECRET
+		);
 
 		// 3) Check if the user still exists
 		const current_user = await User.findById(decoded.id);
-		if (!current_user) throw new Error('The user no longer exists!');
+		if (!current_user)
+			throw new Error('The user no longer exists!');
 
 		// 4) Set local storage and req.user to current_user
 		req.user = current_user;
