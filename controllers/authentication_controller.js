@@ -107,30 +107,3 @@ exports.protect = async (req, res, next) => {
 		});
 	}
 };
-
-// NOT IN USE YET
-
-// exports.is_logged_in = async (req, res, next) => {
-// 	if (req.cookies.jwt) {
-// 		try {
-// 			// 1) Verifies the token
-// 			const decoded = await promisify(jwt.verify)(
-// 				req.cookies.jwt,
-// 				process.env.JWT_SECRET
-// 			);
-
-// 			// 2) Check if the user still exists
-// 			const current_user = await User.findById(decoded.id);
-// 			if (!current_user) {
-// 				return next();
-// 			}
-
-// 			// There is a logged in user
-// 			res.locals.user = current_user;
-// 			return next();
-// 		} catch (err) {
-// 			return next();
-// 		}
-// 	}
-// 	next();
-// };

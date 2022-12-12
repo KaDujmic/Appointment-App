@@ -17,7 +17,6 @@ exports.get_all_appointments = async (req, res, next) => {
 			msg: err.message,
 		});
 	}
-	next();
 };
 
 // Default way to create a appointment, no restrictions yet. Simple error handling.
@@ -36,7 +35,6 @@ exports.create_appointment = async (req, res, next) => {
 			msg: err.message,
 		});
 	}
-	next();
 };
 
 // Update appointment with no restrictions at the moment
@@ -69,7 +67,6 @@ exports.update_appointment = async (req, res, next) => {
 			msg: err.message,
 		});
 	}
-	next();
 };
 
 // Delete appointment with no restrictions at the moment
@@ -90,5 +87,4 @@ exports.delete_appointment = async (req, res, next) => {
 			msg: err.message,
 		});
 	}
-	next();
 };
