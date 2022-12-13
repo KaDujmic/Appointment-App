@@ -98,8 +98,8 @@ appointment_schema.pre('save', function (next) {
 appointment_schema.post('save', async function (next) {
 	const doctor = await User.find(this.doctor);
 	const patient = await User.find(this.patient);
-	// console.log(patient[0]);
 
+	// Create a transporter with your service provider, and your auth info
 	const transporter = nodemailer.createTransport({
 		service: 'gmail',
 		auth: {
@@ -108,6 +108,7 @@ appointment_schema.post('save', async function (next) {
 		}
 	});
 	
+	// Fill out mail options with the infromation needed
 	const mailOptions = {
 		from: 'kdujmic10@gmail.com',
 		to: `${patient[0].email}`,
@@ -115,6 +116,7 @@ appointment_schema.post('save', async function (next) {
 		text: `${patient[0].name}, you have scheduled an appointment with Dr.${doctor[0].name} at ${this.visit_date.toDateString()}.`
 	};
 	
+	// Send email or catch the error e.g. no valid email to send 
 	transporter.sendMail(mailOptions, function(error, info){
 		if (error) {
 	 console.log(error);
