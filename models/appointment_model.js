@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const User = require('./user_model');
 
+const nodemailer = require('nodemailer');
+
 const appointment_schema = new mongoose.Schema({
 	status: {
 		type: String,
@@ -96,21 +98,47 @@ appointment_schema.pre('save', function (next) {
 appointment_schema.post('save', async function (next) {
 	const doctor = await User.find(this.doctor);
 	const patient = await User.find(this.patient);
-	console.log(this, {
-		patient,
-		doctor,
+	// console.log(patient[0]);
+
+	const transporter = nodemailer.createTransport({
+		service: 'gmail',
+		auth: {
+			user: process.env.EMAIL,
+			pass: process.env.EMAIL_PASSWORD
+		}
+	});
+	
+	const mailOptions = {
+		from: 'kdujmic10@gmail.com',
+		to: `${patient[0].email}`,
+		subject: 'Doctor Appointment',
+		text: `${patient[0].name}, you have scheduled an appointment with Dr.${doctor[0].name} at ${this.visit_date.toDateString()}.`
+	};
+	
+	transporter.sendMail(mailOptions, function(error, info){
+		if (error) {
+	 console.log(error);
+		} else {
+			console.log('Email sent: ' + info.response);
+		}
 	});
 });
 
+// This middleware function will populate patient and doctor with their data
 appointment_schema.pre(/^find/, function (next) {
 	this.populate({
 		path: 'doctor',
-		select: '-__v',
+		select: '-__v -_id',
 	});
 	this.populate({
 		path: 'patient',
-		select: '-__v',
+		select: '-__v -_id',
 	});
+	next();
+});
+
+appointment_schema.pre(/^find/, function (next) {
+	this.select('-__v');
 	next();
 });
 
