@@ -29,7 +29,7 @@ cron.schedule('0 * * * * *', function () {
 	expired_appointment.expired_appointment();
 });
 
-cron.schedule('*/10 * * * * *', function () {
+cron.schedule('0 06 * * * *', function () {
 	notification_email.notification_email();
 });
 
