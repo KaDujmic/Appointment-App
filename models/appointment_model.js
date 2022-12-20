@@ -7,13 +7,7 @@ const nodemailer = require('nodemailer');
 const appointment_schema = new mongoose.Schema({
 	status: {
 		type: String,
-		enum: [
-			'Scheduled',
-			'Rescheduled',
-			'Missed',
-			'Canceled',
-			'Done',
-		],
+		enum: ['Scheduled', 'Rescheduled', 'Missed', 'Canceled', 'Done'],
 		default: 'Scheduled',
 		required: true,
 	},
@@ -58,11 +52,7 @@ appointment_schema.pre('save', async function (next) {
 	doctor_appointments = doctor_appointments.map((obj) =>
 		obj.visit_date.toISOString()
 	);
-	if (
-		doctor_appointments.includes(
-			this.visit_date.toISOString()
-		)
-	) {
+	if (doctor_appointments.includes(this.visit_date.toISOString())) {
 		throw new Error(
 			'You cannot schedule an appointment doctor is booked then'
 		);
@@ -104,22 +94,30 @@ appointment_schema.post('save', async function (next) {
 		service: 'gmail',
 		auth: {
 			user: process.env.EMAIL,
-			pass: process.env.EMAIL_PASSWORD
-		}
+			pass: process.env.EMAIL_PASSWORD,
+		},
 	});
-	
+
 	// Fill out mail options with the infromation needed
 	const mailOptions = {
 		from: 'kdujmic10@gmail.com',
 		to: `${patient[0].email}`,
 		subject: 'Doctor Appointment',
-		text: `${patient[0].name}, you have scheduled an appointment with Dr.${doctor[0].name} at ${this.visit_date.toDateString()}.`
+		text: `${
+			patient[0].name
+		}, you have scheduled an appointment with Dr.${
+			doctor[0].name
+		} at ${this.visit_date.toLocaleString('en-US', {
+			dateStyle: 'medium',
+			timeStyle: 'short',
+			hour12: true,
+		})}.`,
 	};
-	
-	// Send email or catch the error e.g. no valid email to send 
-	transporter.sendMail(mailOptions, function(error, info){
+
+	// Send email or catch the error e.g. no valid email to send
+	transporter.sendMail(mailOptions, function (error, info) {
 		if (error) {
-	 console.log(error);
+			console.log(error);
 		} else {
 			console.log('Email sent: ' + info.response);
 		}
@@ -144,9 +142,6 @@ appointment_schema.pre(/^find/, function (next) {
 	next();
 });
 
-const Appointment = mongoose.model(
-	'Appointment',
-	appointment_schema
-);
+const Appointment = mongoose.model('Appointment', appointment_schema);
 
 module.exports = Appointment;
