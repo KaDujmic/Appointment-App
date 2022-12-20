@@ -4,6 +4,7 @@ const app = require('./app');
 const cron = require('node-cron');
 
 const expired_appointment = require('./service/expired_appointment');
+const notification_email = require('./service/notification_email');
 
 dotenv.config({ path: './config.env' });
 
@@ -23,8 +24,13 @@ mongoose
 
 const port = 3000 || process.env.PORT;
 
+// Cron job for u
 cron.schedule('0 * * * * *', function () {
 	expired_appointment.expired_appointment();
+});
+
+cron.schedule('*/10 * * * * *', function () {
+	notification_email.notification_email();
 });
 
 app.listen(port, () => {
