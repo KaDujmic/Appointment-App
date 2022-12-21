@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 const User = require('./user_model');
-
+const validator = require('validator');
 const nodemailer = require('nodemailer');
+const notification_email = require('../service/notification_email');
 
 const appointment_schema = new mongoose.Schema({
 	status: {
@@ -88,40 +88,19 @@ appointment_schema.pre('save', function (next) {
 appointment_schema.post('save', async function (next) {
 	const doctor = await User.find(this.doctor);
 	const patient = await User.find(this.patient);
+	const subject = 'Doctor appointment';
+	const text = `${
+		patient[0].name
+	}, you have scheduled an appointment with Dr.${
+		doctor[0].name
+	} at ${this.visit_date.toLocaleString('en-US', {
+		dateStyle: 'medium',
+		timeZone: 'UTC',
+		timeStyle: 'short',
+		hour12: false,
+	})}.`;
 
-	// Create a transporter with your service provider, and your auth info
-	const transporter = nodemailer.createTransport({
-		service: 'gmail',
-		auth: {
-			user: process.env.EMAIL,
-			pass: process.env.EMAIL_PASSWORD,
-		},
-	});
-
-	// Fill out mail options with the infromation needed
-	const mailOptions = {
-		from: 'kdujmic10@gmail.com',
-		to: `${patient[0].email}`,
-		subject: 'Doctor Appointment',
-		text: `${
-			patient[0].name
-		}, you have scheduled an appointment with Dr.${
-			doctor[0].name
-		} at ${this.visit_date.toLocaleString('en-US', {
-			dateStyle: 'medium',
-			timeStyle: 'short',
-			hour12: true,
-		})}.`,
-	};
-
-	// Send email or catch the error e.g. no valid email to send
-	transporter.sendMail(mailOptions, function (error, info) {
-		if (error) {
-			console.log(error);
-		} else {
-			console.log('Email sent: ' + info.response);
-		}
-	});
+	notification_email.send_mail(patient, doctor, subject, text);
 });
 
 // This middleware function will populate patient and doctor with their data

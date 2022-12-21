@@ -30,7 +30,7 @@ cron.schedule('0 * * * * *', function () {
 });
 
 cron.schedule('0 06 * * * *', function () {
-	notification_email.notification_email();
+	notification_email.reminder_email();
 });
 
 app.listen(port, () => {
