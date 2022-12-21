@@ -18,9 +18,9 @@ const user_schema = new mongoose.Schema({
 		],
 	},
 	role: {
-		type: String,
-		enum: ['admin', 'patient', 'doctor'],
-		default: 'patient',
+		type: mongoose.Schema.ObjectId,
+		ref: 'Role',
+		default: '63a2d8431f8fb2a58aa7b492',
 	},
 	password: {
 		type: String,
@@ -45,8 +45,14 @@ const user_schema = new mongoose.Schema({
 	password_reset_expires: Date,
 });
 
+user_schema.pre(/^find/, function (next) {
+	this.populate({
+		path: 'role',
+	});
+	next();
+});
+
 user_schema.pre('save', async function (next) {
-	console.log('Hello from middleware');
 	if (this.isModified('password')) {
 		this.password = await bcrypt.hash(this.password, 12);
 		this.password_confirm = undefined;
