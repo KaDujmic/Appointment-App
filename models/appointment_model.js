@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const User = require('./user_model');
 const validator = require('validator');
 const nodemailer = require('nodemailer');
-const notification_email = require('../service/notification_email');
+const mail = require('../service/send_email');
 
 const appointment_schema = new mongoose.Schema({
 	status: {
@@ -100,7 +100,7 @@ appointment_schema.post('save', async function (next) {
 		hour12: false,
 	})}.`;
 
-	notification_email.send_mail(patient, doctor, subject, text);
+	mail.send_mail(patient, doctor, subject, text);
 });
 
 // This middleware function will populate patient and doctor with their data
