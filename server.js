@@ -24,11 +24,12 @@ mongoose
 
 const port = process.env.PORT ? process.env.PORT : 3000;
 
-// Cron job for u
+// Cron job for updating appointments if they are missed
 cron.schedule('0 * * * * *', function () {
 	expired_appointment.expired_appointment();
 });
 
+// Cron job for sending an email to remind patients who have an appointment today
 cron.schedule('0 06 * * * *', function () {
 	notification_email.reminder_email();
 });
