@@ -12,7 +12,7 @@ dotenv.config({ path: './config.env' });
 const DB = process.env.DATABASE.replace(
 	'<PASSWORD>',
 	process.env.DATABASE_PASSWORD
-);
+).replace('<USERNAME>', process.env.DATABASE_USERNAME);
 mongoose
 	.connect(DB, {
 		useNewUrlParser: true,
@@ -22,7 +22,7 @@ mongoose
 	})
 	.then(() => console.log('DB connection established'));
 
-const port = 3000 || process.env.PORT;
+const port = process.env.PORT ? process.env.PORT : 3000;
 
 // Cron job for u
 cron.schedule('0 * * * * *', function () {
